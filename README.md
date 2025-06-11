@@ -20,13 +20,13 @@ Dengan berkembangnya teknologi, pendekatan berbasis data dapat digunakan untuk m
 ### Goals
 
 1. Membangun model klasifikasi yang dapat memprediksi label `Fertilizer Name` berdasarkan kombinasi fitur lingkungan dan tanaman.
-2. Menghasilkan hingga tiga rekomendasi pupuk untuk setiap baris data dalam `test.csv`, disusun berdasarkan probabilitas atau keyakinan prediksi.
+2. Menghasilkan hingga tiga rekomendasi pupuk untuk setiap baris data dalam `uji.csv`, disusun berdasarkan probabilitas atau keyakinan prediksi.
 
 ### Solution Statements
 
 - Melatih dan mengevaluasi beberapa algoritma klasifikasi, termasuk XGBoost, Random Forest, dan LightGBM, untuk memprediksi jenis pupuk berdasarkan fitur-fitur seperti suhu, kelembapan, kadar nitrogen, dan jenis tanaman.
 - Menggunakan metrik Mean Average Precision at 3 (mAP@3) sebagai dasar evaluasi model, dengan tujuan mengukur seberapa baik model memberikan tiga rekomendasi pupuk teratas yang paling relevan.
-- Memilih model dengan performa terbaik berdasarkan skor mAP@3 tertinggi pada data validasi, dan menggunakan model tersebut untuk menghasilkan prediksi akhir pada data test.
+- Memilih model dengan performa terbaik berdasarkan skor mAP@3 tertinggi pada data validasi, dan menggunakan model tersebut untuk menghasilkan prediksi akhir pada data uji.
 
 ---
 
@@ -36,11 +36,11 @@ Dataset yang digunakan berasal dari kompetisi **Kaggle Playground Series - Seaso
 
 ### File Dataset
 - `train.csv`: Dataset pelatihan dengan 750.000 entri dan 10 kolom fitur dan label target `Fertilizer Name`.
-- `test.csv`: Dataset pengujian dengan 250.000 baris dan 9 kolom yang tidak menyertakan label `Fertilizer Name`.
+- `uji.csv`: Dataset pengujian dengan 250.000 baris dan 9 kolom yang tidak menyertakan label `Fertilizer Name`.
 - `sample_submission.csv` – Contoh format file pengiriman prediksi (maksimal 3 label, dipisahkan spasi).
 
 ### Variabel-variabel 
-![image](https://github.com/user-attachments/assets/d4aac1e5-7d5a-49b0-a5f6-6ad2346db5db)
+![Data info](https://github.com/user-attachments/assets/f7aa5916-0146-4bd5-b04c-ae9755ee0073)
 
 - Terdapat **3 kolom dengan tipe data `object`**, yaitu:
   - `Soil Type`, `Crop Type`, dan `Fertilizer Name`.  
@@ -65,20 +65,21 @@ Dataset yang digunakan berasal dari kompetisi **Kaggle Playground Series - Seaso
 | Fertilizer Name  | object    | Label target; jenis pupuk yang digunakan (target klasifikasi)             |
 
 ### Memeriksa Outliers
-![image](https://github.com/user-attachments/assets/2bd2cdcd-c88d-424c-8821-5d2efa41177a)
+![Boxplot outlier](https://github.com/user-attachments/assets/5f76da90-a1e4-4ed8-b7bf-0423f8094f93)
+
 Tidak ditemukan outlier pada keenam fitur numerik yang dianalisis.
 
 ### Visualisasi fitur kategorikal
 Untuk memahami hubungan antara fitur kategorikal dengan target klasifikasi (Fertilizer Name), dilakukan visualisasi distribusi jumlah data berdasarkan fitur Soil Type, Crop Type, dan Fertilizer Name.
 
-![image](https://github.com/user-attachments/assets/cf47e12f-bb92-4702-8601-62320e153a7c)
+![Visualisasi Soil Type](https://github.com/user-attachments/assets/e543f82e-c1c4-4b46-814d-3d4229c3673b)
 Gambar di atas menunjukkan jumlah masing-masing Soil Type (Clayey, Sandy, Red, Loamy, dan Black) untuk setiap jenis pupuk. Setiap batang mewakili jumlah kemunculan kombinasi jenis tanah dan pupuk tertentu dalam dataset.
 Dari visualisasi ini, dapat disimpulkan bahwa:
 - Distribusi jumlah data relatif seimbang di antara kombinasi Soil Type dan Fertilizer Name.
 - Tidak terdapat dominasi yang ekstrem dari suatu jenis pupuk terhadap jenis tanah tertentu, yang mengindikasikan tidak adanya bias distribusi yang kuat dalam dataset.
 - Hal ini menunjukkan bahwa model klasifikasi memiliki variasi data yang cukup untuk belajar dari setiap kombinasi Soil Type dan Fertilizer Name.
 
-![image](https://github.com/user-attachments/assets/8e45790b-a5d1-40aa-9d2d-6112162e7091)
+![Visualisasi Crop Type](https://github.com/user-attachments/assets/06c1f422-3d02-4883-81fc-440bad74fe1b)
 Grafik batang di atas menunjukkan distribusi jumlah penggunaan masing-masing jenis pupuk (Fertilizer Name) terhadap berbagai jenis tanaman (Crop Type). Visualisasi ini memberikan gambaran bagaimana frekuensi pemakaian setiap jenis pupuk berbeda-beda tergantung pada jenis tanaman yang dibudidayakan.
 Dari grafik tersebut, dapat diamati beberapa pola:
 - Pupuk jenis 28-28 dan 14-35-14 cenderung banyak digunakan secara merata pada hampir semua jenis tanaman.
@@ -86,7 +87,7 @@ Dari grafik tersebut, dapat diamati beberapa pola:
 - Tanaman seperti Millets, Barley, dan Tobacco memiliki variasi penggunaan pupuk yang lebih rendah secara keseluruhan.
 - Pupuk Urea menunjukkan tingkat penggunaan yang lebih rendah untuk sebagian besar tanaman, khususnya pada Sugarcane dan Pulses.
 
-![image](https://github.com/user-attachments/assets/6f103c81-549a-42dc-bf90-163334c8dbea)
+![Visualisasi Fertilizer Name](https://github.com/user-attachments/assets/d694e883-b621-4b49-8a5b-2cafb741d5be)
 Visualisasi di atas menunjukkan jumlah data untuk masing-masing kategori pada fitur target Fertilizer Name. Grafik ini penting dalam tahap Univariate Exploratory Data Analysis (EDA) untuk mengevaluasi distribusi kelas target sebelum melakukan pemodelan klasifikasi.
 Temuan dari visualisasi:
 - Seluruh jenis pupuk memiliki distribusi yang relatif seimbang, dengan perbedaan jumlah yang tidak terlalu signifikan.
@@ -96,7 +97,7 @@ Temuan dari visualisasi:
 Visualisasi ini membantu dalam menjamin bahwa model machine learning nantinya tidak bias terhadap salah satu jenis pupuk karena ketidakseimbangan data. Distribusi yang cukup seimbang seperti ini ideal untuk klasifikasi multikelas.
 
 ### Hubungan Antar Fitur Numerik
-![image](https://github.com/user-attachments/assets/efd00a19-8c2c-4645-a9fa-1c3a0e1a5bd6)
+![Pairplot Fitur Numerik](https://github.com/user-attachments/assets/a5c8fe37-0ade-4681-bf79-c519f2827c2c)
 Visualisasi ini menunjukkan hubungan antar seluruh fitur numerik dalam dataset melalui pairplot. Tujuan utamanya adalah untuk mengamati apakah terdapat korelasi atau pola hubungan antara masing-masing fitur numerik.
 
 Insight dari visualisasi:
@@ -117,137 +118,128 @@ Pada tahap ini, dilakukan beberapa proses transformasi data agar dataset siap di
 Terdapat tiga fitur kategorikal dalam dataset: `Soil Type`, `Crop Type`, dan `Fertilizer Name`.
 - **`Soil Type` dan `Crop Type`** merupakan fitur input, sehingga dilakukan transformasi menggunakan **One-Hot Encoding**. Teknik ini dipilih agar model tidak menganggap ada hubungan ordinal antar kategori dan untuk memastikan fitur bisa digunakan dalam model yang hanya menerima input numerik.
 - **`Fertilizer Name`** merupakan target variabel (label), sehingga digunakan **Label Encoding** untuk mengubah nama pupuk menjadi nilai numerik. Ini diperlukan agar target label dapat diproses oleh algoritma klasifikasi.
-Langkah encoding ini juga diterapkan pada data **test**, dan dilakukan penyesuaian kolom (alignment) antara data training dan testing menggunakan fungsi `align`, agar struktur kolomnya sama. Jika ada kolom yang tidak tersedia di test set, maka akan diisi dengan nilai 0.
+Langkah encoding ini juga diterapkan pada data **uji**, dan dilakukan penyesuaian kolom (alignment) antara data training dan ujiing menggunakan fungsi `align`, agar struktur kolomnya sama. Jika ada kolom yang tidak tersedia di uji set, maka akan diisi dengan nilai 0.
 
 ### 2. Standardisasi Fitur Numerik
 Seluruh fitur numerik (setelah encoding) kemudian distandarisasi menggunakan **StandardScaler**, yaitu transformasi yang mengubah setiap fitur agar memiliki rata-rata 0 dan standar deviasi 1.
 Standardisasi ini penting agar semua fitur berada dalam skala yang sama, sehingga algoritma machine learning seperti SVM, KNN, atau neural network tidak bias terhadap fitur dengan skala yang lebih besar.
 
 ### 3. Split Data untuk Validasi
-Karena label dari data test tidak tersedia, maka data training dibagi kembali menjadi training dan validation set menggunakan `train_test_split` dengan rasio 80:20.
-Tujuan dari langkah ini adalah untuk melakukan evaluasi lokal menggunakan metrik **mAP@3** pada validation set, sebelum membuat prediksi akhir dengan data test.
+Karena label dari data uji tidak tersedia, maka data training dibagi kembali menjadi training dan validation set menggunakan `train_uji_split` dengan rasio 80:20.
+Tujuan dari langkah ini adalah untuk melakukan evaluasi lokal menggunakan metrik **mAP@3** pada validation set, sebelum membuat prediksi akhir dengan data uji.
 
 ---
-
 ## Modeling
 
-Pada tahap ini, dilakukan pelatihan dan evaluasi beberapa model machine learning untuk menyelesaikan masalah klasifikasi multikelas, yaitu memprediksi jenis pupuk (`Fertilizer Name`) berdasarkan fitur-fitur cuaca, jenis tanah, dan tanaman.
+Pada tahap ini, dilakukan pembangunan dan evaluasi beberapa model machine learning untuk menyelesaikan tugas klasifikasi multikelas, yaitu memprediksi jenis pupuk (**`Fertilizer Name`**) berdasarkan fitur-fitur lingkungan seperti cuaca, jenis tanah, dan tanaman.
 
 ### Tujuan Modeling
 
-- Membangun model klasifikasi untuk memprediksi label pupuk.
-- Membandingkan performa tiga algoritma: **XGBoost**, **Random Forest**, dan **LightGBM**.
-- Memilih model terbaik berdasarkan metrik evaluasi **mAP@3**.
+- Mengembangkan model klasifikasi untuk memprediksi jenis pupuk berdasarkan fitur input.
+- Mencoba dan membandingkan performa tiga algoritma: **Random Forest**, **LightGBM**, dan **XGBoost**.
+- Menentukan model terbaik berdasarkan metrik **Mean Average Precision at 3 (mAP@3)**.
+- Melatih ulang model terbaik untuk prediksi akhir terhadap data uji.
 
-### Fungsi mAP@3
+### Penjelasan Singkat Algoritma
 
-Untuk mengevaluasi performa model, digunakan metrik **Mean Average Precision at 3 (mAP@3)**. Berikut fungsi implementasinya:
+#### 1. **Random Forest**
+Random Forest adalah algoritma ensemble berbasis pohon keputusan (decision tree) yang membangun banyak pohon secara acak (random) dan menggabungkan hasilnya untuk meningkatkan akurasi dan mengurangi overfitting. Model ini bekerja dengan membuat banyak decision tree dari subset data dan fitur yang berbeda, lalu menggabungkan prediksi mereka (dalam klasifikasi: mayoritas voting).
 
-```python
-# Fungsi mAP@3
-def mAPk(actual, predicted, k=3):
-    def apk(a, p, k):
-        # Convert the numpy array slice to a list before using the index method
-        p_list = list(p[:k])
-        if a in p_list:
-            return 1.0 / (p_list.index(a) + 1)
-        return 0.0
-    return np.mean([apk(a, p, k) for a, p in zip(actual, predicted)])
-```
+**Kelebihan:**  
+- Tidak mudah overfitting.  
+- Baik untuk data tabular.  
+- Bisa mengukur pentingnya fitur.  
 
-### Fungsi Evaluasi Model
-Untuk memudahkan proses evaluasi setiap model, digunakan fungsi berikut:
-```
-def evaluate_model(model, name):
-    model.fit(X_train, y_train)
-    probs = model.predict_proba(X_val)
-    top_3 = np.argsort(probs, axis=1)[:, -3:][:, ::-1]
-    score = mAPk(y_val, top_3, k=3)
-    print(f"{name:<20}: mAP@3 = {score:.4f}")
-    return score
-```
-### Evaluasi Semua Model
-Tiga model diuji untuk dibandingkan performanya. Setelah setiap model selesai dilatih dan dievaluasi, objek model dihapus dan memori dibersihkan untuk menghindari kehabisan memori pada Google Colab.
-```
-# Evaluasi semua model
-scores = {}
+**Kekurangan:**  
+- Relatif lambat saat jumlah pohon banyak.  
+- Interpretasi sulit dibanding model linear.  
 
-# XGBoost Classifier
-xgb_model = XGBClassifier(use_label_encoder=False, eval_metric='mlogloss', random_state=42)
-scores['XGBoost'] = evaluate_model(xgb_model, "XGBoost")
+**Parameter yang digunakan:**  
+- `n_estimators=100`  
+  Menentukan jumlah pohon keputusan dalam hutan. Semakin banyak pohon, semakin stabil hasilnya, namun juga memperlama waktu pelatihan. Nilai 100 dipilih sebagai titik awal yang umum dan seimbang antara performa dan waktu.
+- `random_state=42`  
+  Digunakan untuk mengatur seed sehingga hasil model dapat direproduksi (reproducible). Angka 42 dipilih sebagai standar umum untuk konsistensi hasil.
 
-# Bersihkan memori
-del xgb_model
-gc.collect()
 
-# RandomForest Classifier
-rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
-scores['Random Forest'] = evaluate_model(rf_model, "Random Forest")
+#### 2. **LightGBM (Light Gradient Boosting Machine)**
+LightGBM adalah algoritma boosting berbasis pohon yang mengembangkan model secara iteratif untuk mengoreksi kesalahan dari model sebelumnya. Dibandingkan dengan XGBoost, LightGBM dirancang untuk efisiensi tinggi dalam pelatihan dan prediksi.
 
-# Bersihkan memori
-del rf_model
-gc.collect()
+**Kelebihan:**  
+- Pelatihan sangat cepat.  
+- Efisien untuk dataset besar.  
+- Mendukung pengurutan kategori secara otomatis.  
 
-# LightGBM Classifier
-lgbm_model = LGBMClassifier(n_estimators=100, random_state=42)
-scores['LightGBM'] = evaluate_model(lgbm_model, "LightGBM")
+**Kekurangan:**  
+- Bisa overfitting pada dataset kecil.  
+- Kurang robust untuk data yang sangat tidak seimbang.  
 
-# Bersihkan memori
-del lgbm_model
-gc.collect()
-```
+**Parameter yang digunakan:**  
+- `n_estimators=100`  
+  Menentukan jumlah boosting iteration. Sama seperti pada Random Forest, nilai ini digunakan sebagai titik awal yang umum untuk eksperimen awal dan menghasilkan hasil cukup baik tanpa overfitting.
+- `random_state=42`  
+  Menetapkan seed acak agar hasil model tetap konsisten setiap kali dijalankan. Ini penting dalam proyek kolaboratif atau saat menggunakan metode validasi silang.
+
+
+#### 3. **XGBoost (Extreme Gradient Boosting)**
+XGBoost adalah algoritma boosting yang sangat populer dan terbukti unggul dalam berbagai kompetisi data science. Ia bekerja dengan membangun model secara bertahap, fokus memperbaiki kesalahan dari prediksi sebelumnya menggunakan teknik *gradient boosting*.
+
+**Kelebihan:**  
+- Kuat terhadap overfitting dengan regularisasi.  
+- Dapat menangani data tabular dan kompleks.  
+- Dukungan dokumentasi dan komunitas luas.  
+
+**Kekurangan:**  
+- Waktu pelatihan lebih lama dibanding LightGBM.  
+- Lebih banyak parameter yang perlu diatur.
+
+**Parameter yang digunakan:**  
+- `use_label_encoder=False`  
+  Menonaktifkan label encoder bawaan dari XGBoost yang digunakan pada versi sebelumnya. Hal ini dilakukan agar model tidak mengalami error saat menerima label bertipe numerik dari `LabelEncoder`.
+- `eval_metric='mlogloss'`  
+  Menentukan metrik evaluasi saat pelatihan. Multiclass log loss (`mlogloss`) mengukur seberapa baik probabilitas prediksi model mendekati distribusi sebenarnya. Cocok digunakan untuk klasifikasi multikelas.
+- `random_state=42`  
+  Sama seperti sebelumnya, digunakan untuk menjamin reproducibility hasil pelatihan.
 
 ### Hasil Evaluasi Perbandingan
-Setelah seluruh model dievaluasi, dicetak skor mAP@3 dari masing-masing model:
-| Model         | mAP\@3 Score |
-| ------------- | ------------ |
-| XGBoost       | **0.3307**   |
-| Random Forest | 0.2911       |
-| LightGBM      | 0.3230       |
+Untuk menilai performa model klasifikasi multikelas dengan lebih akurat, digunakan metrik **Mean Average Precision at 3 (mAP@3)**, yang mempertimbangkan peringkat dari tiga label teratas dalam prediksi. Model dilatih menggunakan data latih dan divalidasi dengan data validasi.
+Setiap model dievaluasi menggunakan metrik mAP@3, dan hasilnya dibandingkan:
 
-Berdasarkan hasil evaluasi di atas, XGBoost menunjukkan performa terbaik dengan nilai mAP@3 sebesar 0.3307.
+| Model         | mAP@3 Score |
+|---------------|-------------|
+| **XGBoost**       | **0.3307**   |
+| Random Forest | 0.2911      |
+| LightGBM      | 0.3230      |
 
-### Model Final dan Prediksi
-Karena memiliki skor tertinggi, model XGBoost dipilih sebagai model final. Model ini kemudian dilatih ulang menggunakan seluruh data train (X_scaled, y_encoded) dan digunakan untuk memprediksi genre pada data uji.
-```
-final_model = XGBClassifier(use_label_encoder=False, eval_metric='mlogloss', random_state=42)
-final_model.fit(X_scaled, y_encoded)
-```
-Setelah pelatihan ulang selesai, dilakukan prediksi terhadap data test dalam bentuk probabilitas, kemudian diambil tiga label dengan probabilitas tertinggi:
-```
-# Prediksi probabilitas
-test_probs = final_model.predict_proba(test_scaled)
-# Ambil top-3 prediksi
-top_3_preds_idx = np.argsort(test_probs, axis=1)[:, -3:][:, ::-1]
-# Konversi ke label asli
-top_3_preds_label = le.inverse_transform(top_3_preds_idx.ravel()).reshape(top_3_preds_idx.shape)
-```
+> Hasil menunjukkan bahwa **XGBoost** memberikan performa terbaik dalam memprediksi jenis pupuk dengan skor mAP@3 tertinggi.
+
+### Model Terbaik dan Pelatihan Ulang
+
+Berdasarkan evaluasi, **XGBoost** dipilih sebagai model final. Model ini kemudian dilatih ulang menggunakan seluruh data latih (`X_scaled`, `y_encoded`) untuk menghasilkan prediksi pada data uji secara maksimal. Prediksi dibuat dalam bentuk probabilitas, lalu diambil **3 label teratas** (top-3) untuk setiap data uji sebagai hasil akhir prediksi.
+
 ---
 ## Evaluation
 
 ### Metrik Evaluasi: mAP@3 (Mean Average Precision at 3)
 
-Metrik yang digunakan untuk mengevaluasi performa model dalam proyek ini adalah **Mean Average Precision at 3 (mAP@3)**. mAP@3 merupakan metrik yang cocok digunakan pada tugas klasifikasi multikelas di mana model diminta memberikan lebih dari satu prediksi (top-N prediction), dalam hal ini **3 label teratas**.
+Metrik utama yang digunakan dalam proyek ini adalah **Mean Average Precision at 3 (mAP@3)**. Metrik ini dipilih karena sesuai untuk tugas **multi-class classification dengan top-N prediction**, di mana sistem harus memberikan hingga tiga rekomendasi pupuk terbaik berdasarkan input lingkungan dan tanaman.
 
-mAP@3 mengukur seberapa sering label yang benar muncul dalam 3 prediksi teratas dan memperhitungkan **urutan kemunculannya**. Makin tinggi posisi label yang benar, makin tinggi nilai yang diberikan.
+mAP@3 menilai seberapa sering label yang benar muncul dalam 3 prediksi teratas model, sekaligus mempertimbangkan **urutan prediksi**. Artinya, jika label yang benar muncul pada posisi pertama, skornya lebih tinggi dibanding jika berada di posisi kedua atau ketiga.
 
 ### Cara Kerja mAP@3
 
-mAP@3 dihitung dengan langkah-langkah sebagai berikut:
+Langkah perhitungan mAP@3 secara umum:
 
-- Untuk setiap data, cek apakah label sebenarnya ada di antara 3 prediksi teratas model.
-- Jika ya, nilai presisi dihitung sebagai kebalikan dari posisinya:
-  - Posisi ke-1: skor = 1.0
-  - Posisi ke-2: skor = 0.5
-  - Posisi ke-3: skor = 0.333
-- Jika label tidak muncul di 3 teratas, skor = 0.0
-- Skor semua data dijumlahkan dan dirata-rata untuk mendapatkan nilai akhir mAP@3.
+1. Untuk setiap sampel, cek apakah label sebenarnya muncul dalam tiga prediksi teratas model.
+2. Jika muncul:
+   - Posisi 1 → skor = 1.0
+   - Posisi 2 → skor = 0.5
+   - Posisi 3 → skor = 0.333
+3. Jika tidak muncul dalam top-3 → skor = 0.0
+4. Skor dari seluruh data dirata-rata → menghasilkan mAP@3.
 
-#### Rumus mAP@3:
-
-![image](https://github.com/user-attachments/assets/5d6399da-9c64-4da3-9ff2-9f6e6ec83895)
-
+#### Rumus mAP@K:
 Formula evaluasi Mean Average Precision at K (mAP@K) (sumber: Kaggle, 2025)
+![rumus MAP](https://github.com/user-attachments/assets/3f7dd9b0-2539-433f-93c4-323404f428d4)
 
 Di dalam rumus mAP@k, terdapat beberapa komponen penting:
 - U: jumlah total observasi/data (misalnya jumlah data validasi)
@@ -257,19 +249,27 @@ Di dalam rumus mAP@k, terdapat beberapa komponen penting:
 Nilai mAP dihitung dengan menjumlahkan nilai presisi dari posisi di mana label benar ditemukan, kemudian dirata-rata untuk seluruh data.
 Dalam konteks ini menggunakan mAP@3, sehingga nilai k hanya sampai 3, bukan 5 seperti pada gambar di atas, jadi bisa menyesuaikan rumus menjadi mAP@3 sesuai kebutuhan.
 
-### Hasil Evaluasi Akhir
 
-Model telah dievaluasi menggunakan data validasi dengan hasil skor sebagai berikut:
+### Hasil Evaluasi Model
 
-| Model           | mAP@3 Score |
-|----------------|-------------|
-| **XGBoost**     | **0.3307**  |
-| LightGBM       | 0.3215      |
-| Random Forest  | 0.3102      |
+Model dievaluasi menggunakan data validasi, dengan hasil skor mAP@3 sebagai berikut:
 
-Model **XGBoost** dipilih sebagai model final karena memberikan nilai **mAP@3 tertinggi**, yaitu **0.3307**. Ini menunjukkan bahwa rata-rata, label yang benar berhasil diprediksi dalam 3 besar oleh model, dan sering kali berada di posisi yang tinggi.
+| Model         | mAP@3 Score |
+|---------------|-------------|
+| **XGBoost**       | **0.3307**   |
+| Random Forest | 0.2911      |
+| LightGBM      | 0.3230      |
 
-Model ini kemudian digunakan untuk melatih ulang dengan seluruh data pelatihan dan menghasilkan prediksi akhir pada data uji. Hasil prediksi disesuaikan dengan format submission kompetisi.
+Model **XGBoost** memberikan nilai **mAP@3 tertinggi**, yaitu **0.3307**, sehingga dipilih sebagai model final.
+
+### Kesimpulan
+
+Model XGBoost terbukti paling optimal dalam menyelesaikan **dua problem utama proyek ini**, yaitu:
+
+1. **Memprediksi jenis pupuk terbaik** berdasarkan kombinasi fitur lingkungan dan tanaman dengan akurasi ranking yang tinggi.
+2. **Memberikan hingga tiga rekomendasi pupuk** yang relevan untuk setiap kondisi, dengan mempertimbangkan probabilitas prediksi.
+
+Dengan nilai mAP@3 sebesar 0.3307, model ini berhasil menempatkan label yang benar dalam **tiga besar rekomendasi** secara konsisten. Hasil ini menunjukkan bahwa sistem yang dibangun dapat digunakan untuk mendukung pengambilan keputusan dalam pemberian pupuk berbasis data.
 
 ---
 ##  Hasil Prediksi (Submission.csv)
@@ -281,11 +281,14 @@ Hasil prediksi berupa 3 label teratas untuk setiap entri diproses menjadi format
 - Fertilizer Name → Tiga prediksi label teratas dalam format string, dipisahkan spasi
 
 Setelah file berhasil disimpan, berikut adalah cuplikan isi file submission.csv:
-
-![image](https://github.com/user-attachments/assets/aaf3c521-049f-48b4-88e7-c71d5bfd44e2)
+![submission](https://github.com/user-attachments/assets/1fcb4d43-7918-47f8-bd29-f5d8364b0c9d)
 
 
 ---
 ## Referensi
-Kaggle. (2025). Evaluation metric: Mean Average Precision at K (mAP@K)[Screenshot]. Kaggle. [https://www.kaggle.com/competitions/playground-series-s5e6/overview](https://www.kaggle.com/competitions/playground-series-s5e6/overview)
-Nuruzzaman, M., Bahar, M. M., & Naidu, R. (2025, January 25). Diffuse soil pollution from agriculture: Impacts and remediation. Science of the Total Environment. Elsevier B.V. [https://doi.org/10.1016/j.scitotenv.2025.178398](https://doi.org/10.1016/j.scitotenv.2025.178398)
+1. Breiman, L. *Random Forests*. Machine Learning 45, 5–32 (2001). [https://doi.org/10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324)
+2. Chen, T., & Guestrin, C. (2016). *XGBoost: A scalable tree boosting system*. In Proceedings of the ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (Vol. 13-17-August-2016, pp. 785–794). Association for Computing Machinery. [https://doi.org/10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785)
+3.Evidently AI. (2025, January 9). Mean Average Precision (MAP) in ranking and recommendations. Retrieved from [https://www.evidentlyai.com/ranking-metrics/mean-average-precision-map](https://www.evidentlyai.com/ranking-metrics/mean-average-precision-map)
+4. Kaggle. (2025). Evaluation metric: Mean Average Precision at K (mAP@K)[Screenshot]. Kaggle. [https://www.kaggle.com/competitions/playground-series-s5e6/overview](https://www.kaggle.com/competitions/playground-series-s5e6/overview)
+5. Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., ... & Liu, T. Y. (2017). LightGBM: A highly efficient gradient boosting decision tree. Advances in Neural Information Processing Systems, 30. [https://papers.nips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html](https://papers.nips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html)
+6. Nuruzzaman, M., Bahar, M. M., & Naidu, R. (2025, January 25). Diffuse soil pollution from agriculture: Impacts and remediation. Science of the Total Environment. Elsevier B.V. [https://doi.org/10.1016/j.scitotenv.2025.178398](https://doi.org/10.1016/j.scitotenv.2025.178398)
