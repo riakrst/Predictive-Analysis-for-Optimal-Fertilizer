@@ -247,6 +247,7 @@ Di dalam rumus MAP@k, terdapat beberapa komponen penting:
 - P(k): nilai precision (presisi) pada posisi ke-k
 - n: jumlah prediksi per observasi (misalnya 3 jika kita menggunakan MAP@3)
 - rel(k): fungsi indikator yang bernilai 1 jika label pada posisi ke-k benar (relevan), dan 0 jika tidak
+
 Nilai MAP dihitung dengan menjumlahkan nilai presisi dari posisi di mana label benar ditemukan, kemudian dirata-rata untuk seluruh data.
 Dalam konteks ini menggunakan MAP@3, sehingga nilai k hanya sampai 3, bukan 5 seperti pada gambar di atas, jadi bisa menyesuaikan rumus menjadi MAP@3 sesuai kebutuhan.
 
