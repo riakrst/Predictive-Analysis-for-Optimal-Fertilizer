@@ -25,8 +25,8 @@ Dengan berkembangnya teknologi, pendekatan berbasis data dapat digunakan untuk m
 ### Solution Statements
 
 - Melatih dan mengevaluasi beberapa algoritma klasifikasi, termasuk XGBoost, Random Forest, dan LightGBM, untuk memprediksi jenis pupuk berdasarkan fitur-fitur seperti suhu, kelembapan, kadar nitrogen, dan jenis tanaman.
-- Menggunakan metrik Mean Average Precision at 3 (mAP@3) sebagai dasar evaluasi model, dengan tujuan mengukur seberapa baik model memberikan tiga rekomendasi pupuk teratas yang paling relevan.
-- Memilih model dengan performa terbaik berdasarkan skor mAP@3 tertinggi pada data validasi, dan menggunakan model tersebut untuk menghasilkan prediksi akhir pada data uji.
+- Menggunakan metrik Mean Average Precision at 3 (MAP@3) sebagai dasar evaluasi model, dengan tujuan mengukur seberapa baik model memberikan tiga rekomendasi pupuk teratas yang paling relevan.
+- Memilih model dengan performa terbaik berdasarkan skor MAP@3 tertinggi pada data validasi, dan menggunakan model tersebut untuk menghasilkan prediksi akhir pada data uji.
 
 ---
 
@@ -126,7 +126,7 @@ Standardisasi ini penting agar semua fitur berada dalam skala yang sama, sehingg
 
 ### 3. Split Data untuk Validasi
 Karena label dari data uji tidak tersedia, maka data training dibagi kembali menjadi training dan validation set menggunakan `train_uji_split` dengan rasio 80:20.
-Tujuan dari langkah ini adalah untuk melakukan evaluasi lokal menggunakan metrik **mAP@3** pada validation set, sebelum membuat prediksi akhir dengan data uji.
+Tujuan dari langkah ini adalah untuk melakukan evaluasi lokal menggunakan metrik **MAP@3** pada validation set, sebelum membuat prediksi akhir dengan data uji.
 
 ---
 ## Modeling
@@ -137,7 +137,7 @@ Pada tahap ini, dilakukan pembangunan dan evaluasi beberapa model machine learni
 
 - Mengembangkan model klasifikasi untuk memprediksi jenis pupuk berdasarkan fitur input.
 - Mencoba dan membandingkan performa tiga algoritma: **Random Forest**, **LightGBM**, dan **XGBoost**.
-- Menentukan model terbaik berdasarkan metrik **Mean Average Precision at 3 (mAP@3)**.
+- Menentukan model terbaik berdasarkan metrik **Mean Average Precision at 3 (MAP@3)**.
 - Melatih ulang model terbaik untuk prediksi akhir terhadap data uji.
 
 ### Penjelasan Singkat Algoritma
@@ -201,16 +201,16 @@ XGBoost adalah algoritma boosting yang sangat populer dan terbukti unggul dalam 
   Sama seperti sebelumnya, digunakan untuk menjamin reproducibility hasil pelatihan.
 
 ### Hasil Evaluasi Perbandingan
-Untuk menilai performa model klasifikasi multikelas dengan lebih akurat, digunakan metrik **Mean Average Precision at 3 (mAP@3)**, yang mempertimbangkan peringkat dari tiga label teratas dalam prediksi. Model dilatih menggunakan data latih dan divalidasi dengan data validasi.
-Setiap model dievaluasi menggunakan metrik mAP@3, dan hasilnya dibandingkan:
+Untuk menilai performa model klasifikasi multikelas dengan lebih akurat, digunakan metrik **Mean Average Precision at 3 (MAP@3)**, yang mempertimbangkan peringkat dari tiga label teratas dalam prediksi. Model dilatih menggunakan data latih dan divalidasi dengan data validasi.
+Setiap model dievaluasi menggunakan metrik MAP@3, dan hasilnya dibandingkan:
 
-| Model         | mAP@3 Score |
+| Model         | MAP@3 Score |
 |---------------|-------------|
 | **XGBoost**       | **0.3307**   |
 | Random Forest | 0.2911      |
 | LightGBM      | 0.3230      |
 
-> Hasil menunjukkan bahwa **XGBoost** memberikan performa terbaik dalam memprediksi jenis pupuk dengan skor mAP@3 tertinggi.
+> Hasil menunjukkan bahwa **XGBoost** memberikan performa terbaik dalam memprediksi jenis pupuk dengan skor MAP@3 tertinggi.
 
 ### Model Terbaik dan Pelatihan Ulang
 
@@ -219,15 +219,15 @@ Berdasarkan evaluasi, **XGBoost** dipilih sebagai model final. Model ini kemudia
 ---
 ## Evaluation
 
-### Metrik Evaluasi: mAP@3 (Mean Average Precision at 3)
+### Metrik Evaluasi: MAP@3 (Mean Average Precision at 3)
 
-Metrik utama yang digunakan dalam proyek ini adalah **Mean Average Precision at 3 (mAP@3)**. Metrik ini dipilih karena sesuai untuk tugas **multi-class classification dengan top-N prediction**, di mana sistem harus memberikan hingga tiga rekomendasi pupuk terbaik berdasarkan input lingkungan dan tanaman.
+Metrik utama yang digunakan dalam proyek ini adalah **Mean Average Precision at 3 (MAP@3)**. Metrik ini dipilih karena sesuai untuk tugas **multi-class classification dengan top-N prediction**, di mana sistem harus memberikan hingga tiga rekomendasi pupuk terbaik berdasarkan input lingkungan dan tanaman.
 
-mAP@3 menilai seberapa sering label yang benar muncul dalam 3 prediksi teratas model, sekaligus mempertimbangkan **urutan prediksi**. Artinya, jika label yang benar muncul pada posisi pertama, skornya lebih tinggi dibanding jika berada di posisi kedua atau ketiga.
+MAP@3 menilai seberapa sering label yang benar muncul dalam 3 prediksi teratas model, sekaligus mempertimbangkan **urutan prediksi**. Artinya, jika label yang benar muncul pada posisi pertama, skornya lebih tinggi dibanding jika berada di posisi kedua atau ketiga.
 
-### Cara Kerja mAP@3
+### Cara Kerja MAP@3
 
-Langkah perhitungan mAP@3 secara umum:
+Langkah perhitungan MAP@3 secara umum:
 
 1. Untuk setiap sampel, cek apakah label sebenarnya muncul dalam tiga prediksi teratas model.
 2. Jika muncul:
@@ -235,32 +235,33 @@ Langkah perhitungan mAP@3 secara umum:
    - Posisi 2 → skor = 0.5
    - Posisi 3 → skor = 0.333
 3. Jika tidak muncul dalam top-3 → skor = 0.0
-4. Skor dari seluruh data dirata-rata → menghasilkan mAP@3.
+4. Skor dari seluruh data dirata-rata → menghasilkan MAP@3.
 
-#### Rumus mAP@K:
-Formula evaluasi Mean Average Precision at K (mAP@K) (sumber: Kaggle, 2025)
+#### Rumus MAP@K:
+Formula evaluasi Mean Average Precision at K (MAP@K) (sumber: Kaggle, 2025)
+
 ![rumus MAP](https://github.com/user-attachments/assets/3f7dd9b0-2539-433f-93c4-323404f428d4)
 
-Di dalam rumus mAP@k, terdapat beberapa komponen penting:
+Di dalam rumus MAP@k, terdapat beberapa komponen penting:
 - U: jumlah total observasi/data (misalnya jumlah data validasi)
 - P(k): nilai precision (presisi) pada posisi ke-k
-- n: jumlah prediksi per observasi (misalnya 3 jika kita menggunakan mAP@3)
+- n: jumlah prediksi per observasi (misalnya 3 jika kita menggunakan MAP@3)
 - rel(k): fungsi indikator yang bernilai 1 jika label pada posisi ke-k benar (relevan), dan 0 jika tidak
-Nilai mAP dihitung dengan menjumlahkan nilai presisi dari posisi di mana label benar ditemukan, kemudian dirata-rata untuk seluruh data.
-Dalam konteks ini menggunakan mAP@3, sehingga nilai k hanya sampai 3, bukan 5 seperti pada gambar di atas, jadi bisa menyesuaikan rumus menjadi mAP@3 sesuai kebutuhan.
+Nilai MAP dihitung dengan menjumlahkan nilai presisi dari posisi di mana label benar ditemukan, kemudian dirata-rata untuk seluruh data.
+Dalam konteks ini menggunakan MAP@3, sehingga nilai k hanya sampai 3, bukan 5 seperti pada gambar di atas, jadi bisa menyesuaikan rumus menjadi MAP@3 sesuai kebutuhan.
 
 
 ### Hasil Evaluasi Model
 
-Model dievaluasi menggunakan data validasi, dengan hasil skor mAP@3 sebagai berikut:
+Model dievaluasi menggunakan data validasi, dengan hasil skor MAP@3 sebagai berikut:
 
-| Model         | mAP@3 Score |
+| Model         | MAP@3 Score |
 |---------------|-------------|
 | **XGBoost**       | **0.3307**   |
 | Random Forest | 0.2911      |
 | LightGBM      | 0.3230      |
 
-Model **XGBoost** memberikan nilai **mAP@3 tertinggi**, yaitu **0.3307**, sehingga dipilih sebagai model final.
+Model **XGBoost** memberikan nilai **MAP@3 tertinggi**, yaitu **0.3307**, sehingga dipilih sebagai model final.
 
 ### Kesimpulan
 
@@ -269,7 +270,7 @@ Model XGBoost terbukti paling optimal dalam menyelesaikan **dua problem utama pr
 1. **Memprediksi jenis pupuk terbaik** berdasarkan kombinasi fitur lingkungan dan tanaman dengan akurasi ranking yang tinggi.
 2. **Memberikan hingga tiga rekomendasi pupuk** yang relevan untuk setiap kondisi, dengan mempertimbangkan probabilitas prediksi.
 
-Dengan nilai mAP@3 sebesar 0.3307, model ini berhasil menempatkan label yang benar dalam **tiga besar rekomendasi** secara konsisten. Hasil ini menunjukkan bahwa sistem yang dibangun dapat digunakan untuk mendukung pengambilan keputusan dalam pemberian pupuk berbasis data.
+Dengan nilai mAP@3 sebesar 0.3307, model ini menunjukkan bahwa dalam rata-rata, label pupuk yang benar berhasil diprediksi dalam tiga posisi teratas oleh sistem. Meskipun nilai ini belum tergolong tinggi secara absolut, hasil tersebut sudah mencerminkan performa yang cukup baik untuk digunakan sebagai sistem prediksi dalam pemilihan pupuk berbasis data.
 
 ---
 ##  Hasil Prediksi (Submission.csv)
@@ -281,6 +282,7 @@ Hasil prediksi berupa 3 label teratas untuk setiap entri diproses menjadi format
 - Fertilizer Name → Tiga prediksi label teratas dalam format string, dipisahkan spasi
 
 Setelah file berhasil disimpan, berikut adalah cuplikan isi file submission.csv:
+
 ![submission](https://github.com/user-attachments/assets/1fcb4d43-7918-47f8-bd29-f5d8364b0c9d)
 
 
@@ -288,7 +290,7 @@ Setelah file berhasil disimpan, berikut adalah cuplikan isi file submission.csv:
 ## Referensi
 1. Breiman, L. *Random Forests*. Machine Learning 45, 5–32 (2001). [https://doi.org/10.1023/A:1010933404324](https://doi.org/10.1023/A:1010933404324)
 2. Chen, T., & Guestrin, C. (2016). *XGBoost: A scalable tree boosting system*. In Proceedings of the ACM SIGKDD International Conference on Knowledge Discovery and Data Mining (Vol. 13-17-August-2016, pp. 785–794). Association for Computing Machinery. [https://doi.org/10.1145/2939672.2939785](https://doi.org/10.1145/2939672.2939785)
-3.Evidently AI. (2025, January 9). Mean Average Precision (MAP) in ranking and recommendations. Retrieved from [https://www.evidentlyai.com/ranking-metrics/mean-average-precision-map](https://www.evidentlyai.com/ranking-metrics/mean-average-precision-map)
-4. Kaggle. (2025). Evaluation metric: Mean Average Precision at K (mAP@K)[Screenshot]. Kaggle. [https://www.kaggle.com/competitions/playground-series-s5e6/overview](https://www.kaggle.com/competitions/playground-series-s5e6/overview)
+3.Evidently AI. (2025, January 9). Mean Average Precision (MAP) in ranking and recommendations. Retrieved from [https://www.evidentlyai.com/ranking-metrics/mean-average-precision-MAP](https://www.evidentlyai.com/ranking-metrics/mean-average-precision-MAP)
+4. Kaggle. (2025). Evaluation metric: Mean Average Precision at K (MAP@K)[Screenshot]. Kaggle. [https://www.kaggle.com/competitions/playground-series-s5e6/overview](https://www.kaggle.com/competitions/playground-series-s5e6/overview)
 5. Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., ... & Liu, T. Y. (2017). LightGBM: A highly efficient gradient boosting decision tree. Advances in Neural Information Processing Systems, 30. [https://papers.nips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html](https://papers.nips.cc/paper_files/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html)
 6. Nuruzzaman, M., Bahar, M. M., & Naidu, R. (2025, January 25). Diffuse soil pollution from agriculture: Impacts and remediation. Science of the Total Environment. Elsevier B.V. [https://doi.org/10.1016/j.scitotenv.2025.178398](https://doi.org/10.1016/j.scitotenv.2025.178398)
